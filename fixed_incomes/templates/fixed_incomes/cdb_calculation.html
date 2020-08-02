@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculadora CDB</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+<body>
+    <div id="cdb-tool" class="container my-5">
+        <div class="row">
+            <div class="col">
+                <h3>Calculadora CDB</h3>
+                <p>Selecione o valor investido, taxa paga e o período que deseja simular.</p>
+            </div>
+        </div>
+        <div class="row my-4">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">CDB investido (R$)</label>
+                    <input type="number" class="form-control" v-model="cdbValue" placeholder="0.00" @change="loadData()">
+{#                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> #}
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Taxa do CDB (% CDI)</label>
+                    <input type="number" class="form-control" v-model="cdbRate" @change="loadData()">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Período inicial</label>
+                    <input type="date" class="form-control" min="2010-01-04" max="2019-12-03"
+                           v-model="cdbStart" @change="loadData()">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Período final</label>
+                    <input type="date" class="form-control" min="2010-01-04" max="2019-12-03"
+                           v-model="cdbEnd" @change="loadData()">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script>
+        const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        const config = {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Valor',
+                    backgroundColor: '#1cbcc3',
+                    borderColor: '#52de8d',
+                    data: [],
+                    fill: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                tooltips: {
+                    mode: 'index',
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Data'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Valor (R$)'
+                        }
+                    }]
+                }
+            }
+        };
+
+        window.onload = function() {
+			const ctx = document.getElementById('canvas').getContext('2d');
+			window.myLine = new Chart(ctx, config);
+		};
+
+    </script>
+    <script>
+        const api_url = '/api/fixed-incomes/cdb/calculate'
+
+        $(document).ready(function() {
+            const app = new Vue({
+                el: '#cdb-tool',
+                delimiters: ['[[', ']]'],
+                data() {
+                    return {
+                        loading: false, errored: false, dataInfo: null,
+                        cdbValue: 1000, cdbRate: 103.5, cdbStart: '2016-11-14', cdbEnd: '2016-12-26',
+                    }
+                },
+                methods: {
+                    loadData() {
+                        if (this.cdbValue && this.cdbRate && this.cdbStart && this.cdbEnd) {
+                            this.loading = true;
+
+                            const params = {
+                                "investmentDate": this.cdbStart,
+                                "cdbRate": this.cdbRate,
+                                "currentDate": this.cdbEnd,
+                            }
+                            axios.get(api_url, {'params': params})
+                                .then(response => {
+                                    this.dataInfo = response.data;
+                                    console.log(this.dataInfo);
+
+                                    let newDataset = config.data.datasets[0];
+                                    newDataset.data = this.dataInfo.map(x => this.cdbValue * parseFloat(x.unitPrice));
+                                    console.log(newDataset.data);
+                                    config.data.datasets = [newDataset];
+//
+                                    config.data.labels = this.dataInfo.map(x => x.date);
+                                    window.myLine.update();
+                                })
+                                .catch(error => {
+                                    console.log(error);
+                                    this.errored = true;
+                                })
+                                .finally(() => this.loading = false)
+                        }
+                    },
+                },
+                mounted(){
+                    this.loadData();
+                }
+            })
+        });
+    </script>
+</body>
+</html>
