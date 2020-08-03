@@ -1,5 +1,6 @@
+# CDB Calculator
 
-This application calculates the evolution of a CDB, using a chart and exposes an API, based on values extracted from a 
+This application calculates the evolution of a CDB and exposes an API and a web page using a chart, based on values extracted from a 
 CSV file, containing the CDI historical series during certain interval.
 
 `Sqlite` was used for the database, but it can be easily changed just by changing the connection settings in `settings.py` file.
@@ -10,11 +11,11 @@ If you want to try a demo, go to
 
 How to run
 ------------------------------
-1. With python 3.7 or earlier and Pipenv installed (or with pip and some virtual environment)
-    1. Run `pipenv install` to install the packages.
-2. Run the application inside the Pipenv created environment
-    1. `pipenv run python manage.py runserver 8000`
-    2. If you prefer, you can access directly, activating the pipenv shell before (`pipenv shell` and `python manage.py runserver 8000`)
+1. With Python 3.7 or earlier and Pipenv installed (or with pip and some virtual environment)
+    - Run `pipenv install` to install the packages.
+2. Run the application using the Pipenv created environment
+    - `pipenv run python manage.py runserver 8000`
+    - If you prefer, you can access directly, activating the pipenv shell before (`pipenv shell` and `python manage.py runserver 8000`)
 
 Access the application
 ------------------------------
