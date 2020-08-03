@@ -45,6 +45,7 @@ Running the tests
 Ideas for improvements
 ------------------------------
 - [x] ~~Asyncronous API fetch on the web page~~ 
+- [x] ~~Separated Django settings environment for a safe deployment~~ 
 - [ ] Fetch CDI values from some API from times to times and use some scheduler like `crontab` 
 - [ ] Add other types of fixed income
 

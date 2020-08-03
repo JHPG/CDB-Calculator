@@ -1,0 +1,1 @@
+web: gunicorn CDB_Calculator.wsgi --env DJANGO_SETTINGS_MODULE=CDB_Calculator.settings.production
