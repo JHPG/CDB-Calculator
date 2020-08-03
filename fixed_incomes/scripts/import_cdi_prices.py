@@ -21,7 +21,7 @@ def import_cdi_prices():
             date = datetime.strptime(row['dtDate'], '%d/%m/%Y')
             insert_list.append(CdiPrice(date=date, trade_price=row['dLastTradePrice']))
 
-        CdiPrice.objects.bulk_create(insert_list)
+        CdiPrice.objects.bulk_create(insert_list, ignore_conflicts=True)
         logging.info('Data imported.')
 
 
