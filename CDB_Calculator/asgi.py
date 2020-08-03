@@ -1,5 +1,5 @@
 """
-ASGI config for CDB_Challenge_test project.
+ASGI config for CDB_Calculator project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'CDB_Challenge_test.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'CDB_Calculator.settings')
 
 application = get_asgi_application()
